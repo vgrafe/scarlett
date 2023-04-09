@@ -19,7 +19,7 @@ import { systemPrompt } from "../lib/systemPrompt";
 import { welcomeText } from "../lib/welcomeText";
 import { Text } from "./text";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useScarlettStore } from "lib/store";
+import { useScarlettStore } from "../lib/store";
 
 const USE_ELEVENLABS = true;
 
