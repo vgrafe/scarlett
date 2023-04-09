@@ -2,6 +2,7 @@ import { useScarlettStore } from "../lib/store";
 import { View, TextInput, Button, StyleSheet } from "react-native";
 import { Text } from "./text";
 import { useState } from "react";
+import * as SecureStore from "expo-secure-store";
 
 export const ApiKeysForm = () => {
   const setSecrets = useScarlettStore((a) => a.setSecrets);
@@ -33,12 +34,15 @@ export const ApiKeysForm = () => {
       />
       <Button
         title="OK"
-        onPress={() =>
+        onPress={async () => {
+          await SecureStore.setItemAsync("OPENAI_API_KEY", openAi);
+          await SecureStore.setItemAsync("ELEVENLABS_API_KEY", elevenLabs);
+
           setSecrets({
             openAi,
             elevenLabs,
-          })
-        }
+          });
+        }}
       />
     </View>
   );

@@ -25,9 +25,11 @@ const initialLoad = async () => {
     "ELEVENLABS_API_KEY"
   );
 
-  useScarlettStore().setSecrets({
-    openAi: OPENAI_API_KEY,
-    elevenLabs: ELEVENLABS_API_KEY,
+  useScarlettStore.setState({
+    secrets: {
+      openAi: OPENAI_API_KEY,
+      elevenLabs: ELEVENLABS_API_KEY,
+    },
   });
 };
 
