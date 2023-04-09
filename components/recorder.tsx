@@ -27,21 +27,18 @@ const CHATGPT_35_COST_PER_TOKEN = 0.000002;
 const WHISPER_COST_PER_MINUTE = 0.006;
 
 export const Recorder = () => {
-  const [totalCost, setTotalCost] = useState(0);
+  const [minutesUsed, setMinutesUsed] = useState(0);
+  const [tokensUsed, setTokensUsed] = useState(0);
 
   const secrets = useScarlettStore((a) => a.secrets);
 
   useEffect(() => {
     const loadTokenUse = async () => {
-      const tokenUse = await AsyncStorage.getItem("totalCost");
-      setTotalCost(parseInt(tokenUse) || 0);
+      const tokenUse = await AsyncStorage.getItem("tokenUse");
+      setTokensUsed(parseInt(tokenUse) || 0);
     };
     loadTokenUse();
   }, []);
-
-  console.log({
-    totalCost,
-  });
 
   const [status, setStatus] = useState<"ready" | "thinking" | "speaking">(
     "ready"
@@ -56,12 +53,11 @@ export const Recorder = () => {
 
   const { startRecording, stopRecording, recording } = useRecorder({
     onSoundRecorded: async (recording, minutes) => {
-      const whisperCost = minutes * WHISPER_COST_PER_MINUTE;
       await AsyncStorage.setItem(
-        "totalCost",
-        (totalCost + whisperCost).toString()
+        "minutesUsed",
+        (minutesUsed + minutes).toString()
       );
-      setTotalCost((t) => t + whisperCost);
+      setMinutesUsed((t) => t + minutes);
 
       setStatus("thinking");
       const uri = recording.getURI();
@@ -83,10 +79,10 @@ export const Recorder = () => {
       );
       const response = gptAnswer.choices[0].message.content;
 
-      const gptCost = Math.round((totalCost * CHATGPT_35_COST_PER_TOKEN) / 100);
+      // const gptCost = Math.round(totalCost);
 
-      await AsyncStorage.setItem("totalCost", (totalCost + gptCost).toString());
-      setTotalCost((t) => t + gptCost);
+      // await AsyncStorage.setItem("totalCost", (totalCost + gptCost).toString());
+      // setTotalCost((t) => t + gptCost);
 
       setChatLines((c) => [...c, { role: "assistant", content: response }]);
 
@@ -101,8 +97,6 @@ export const Recorder = () => {
       } else sayWithSystemSpeech(response);
     },
   });
-
-  // fuck reanimated
 
   // const eventHandler = useAnimatedGestureHandler({
   //   onStart: (event, ctx) => {
